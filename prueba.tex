@@ -1,0 +1,107 @@
+\documentclass{article}
+
+\usepackage[
+	estudiante=0, % usar '1' para versión estudiante.
+]{pruebaua}
+
+% ---------------------------------------------------------------------------------------------
+
+% RESULTADOS, CRITERIOS E INSTRUCCIONES:
+
+\def\resultados{
+	\resultado{Modela matemáticamente el universo tridimensional aplicando vectores en el contexto de fuerza, movimiento y energía.}
+}
+
+\def\criteriouno{Explica el significado de las funciones seno, coseno y tangente.}
+\def\criteriodos{Formula el vector posición, su módulo y su versor y aplica conceptos de ángulos directores.}
+\def\criteriotre{Calcula producto punto y producto cruz (trabajo y torque).}
+\def\criteriocua{Expresa sus ideas en forma oral y escrita de manera lógica y coherente.}
+
+\def\criterios{
+	\criterio{1}{\criteriouno}
+	\criterio{2}{\criteriodos}
+	\criterio{3}{\criteriotre}
+	\criterio{4}{\criteriocua}
+}
+
+\def\instrucciones{
+	\instruccion{Esta evaluación se realizará a través de Microsoft Teams.}
+	\instruccion{Dispone de 120 minutos para contestar, recuerde enviar su cuestionario antes de cerrarlo.}
+	\instruccion{Utilice el Chat de Microsoft Teams en caso que sea necesario contactar al docente.}
+	\instruccion{No se aceptan consultas de contenido durante el desarrollo de la evaluación.}
+	\instruccion{Fundamente y desarrolle detalladamente sus respuestas.}
+}
+
+% ---------------------------------------------------------------------------------------------
+
+% INSTRUMENTO:
+
+\begin{document}
+
+\begin{prueba}[
+	criterios=\criterios,
+	curso=QYF200 CÁLCULO,
+	docente=Diego ARCIS,
+	exigencia=60,
+	fecha=21 de marzo de 2022,
+	instrucciones=\instrucciones,
+	logo=logo.pdf,
+	puntajegeneral=3,
+	puntajemultiple=2,
+	nivel=2,
+	resultados=\resultados,
+	titulo=Prueba 1,
+]{PRUEBA}
+
+\seccionmultiple
+
+\subcriterios{
+	\subcriterio{1}{\criteriouno}
+	\subcriterio{3}{\criteriotre}
+}
+
+% \preguntamultiple{PREGUNTA P1}{PREGUNTA P2}{ALTERNATIVAS}{ALTERNATIVA CORRECTA}{DESARROLLO}
+
+\preguntamultiple[
+	respuesta=a
+]{Pregunta de prueba inicial...}{Pregunta de prueba final...}{
+	\alternativa{Alternativa 1...}
+	\alternativa{Alternativa 2...}
+	\alternativa{Alternativa 3...}
+}{Respuesta de prueba... \punto{1}}
+
+\preguntamultiple[
+	respuesta=a
+]{Pregunta de prueba inicial...}{Pregunta de prueba final...}{
+	\alternativa{Alternativa 1...}
+	\alternativa{Alternativa 2...}
+	\alternativa{Alternativa 3...}
+}{Respuesta de prueba... \punto{1}}
+
+\secciondesarrollo
+
+% \preguntadesarrollo{PREGUNTA PT1}{PUNTAJE}{PREGUNTA PT2}{DESARROLLO}{ESPACIO}
+
+\subcriterios{
+	\subcriterio{2}{\criteriodos}
+	\subcriterio{4}{\criteriocua}
+}
+
+\preguntadesarrollo[
+	espacio=3,
+	puntaje=2,
+]{Pregunta de prueba...}{ Continuación de prueba...}{Respuesta de prueba... \punto{1}}
+
+\preguntadesarrollo[
+	espacio=3,
+	puntaje=2,
+]{Pregunta de prueba...}{ Continuación de prueba...}{Respuesta de prueba... \punto{1}}
+
+\preguntadesarrollo[
+	espacio=3,
+	puntaje=2,
+]{Pregunta de prueba...}{ Continuación de prueba...}{Respuesta de prueba... \punto{1}}
+
+\end{prueba}
+
+\end{document}

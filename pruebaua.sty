@@ -1,0 +1,352 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{pruebaua}[2022/03/20 v1.1 PruebaUA]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% VARIABLES GLOBALES:
+
+% paquete inicial para variables.
+\RequirePackage{xkeyval}
+
+% define variables globales.
+\makeatletter
+\define@cmdkey[ua]{glob}{anchocabecera}{}
+\define@cmdkey[ua]{glob}{anchotabla}{}
+\define@cmdkey[ua]{glob}{espaciorespuesta}{}
+\define@cmdkey[ua]{glob}{estudiante}{}
+\define@cmdkey[ua]{glob}{papel}{}
+\define@cmdkey[ua]{glob}{verpuntos}{}
+
+% asigna valores por defecto para variables globales.
+\presetkeys[ua]{glob}{
+	anchocabecera=4.5, % ancho del centro del encabezado ('4' funciona bien para 'a4paper').
+	anchotabla=16.8, % ancho de las tablas ('16.3' funciona bien para 'a4paper').
+	espaciorespuesta=3, % centímetros para responder en desarrollo.
+	estudiante=0, % usar '1' para versión estudiante.
+	papel=letterpaper, % tamaño de la hoja (puede ser 'letterpaper' o 'a4paper').
+	verpuntos=1,
+}{}
+
+% inicializa variables globales.
+\setkeys[ua]{glob}{}
+
+% asigna valores personalizados de variables globales.
+\DeclareOptionX{anchocabecera}{\renewcommand{\cmdua@glob@anchocabecera}{#1}}
+\DeclareOptionX{anchotabla}{\renewcommand{\cmdua@glob@anchotabla}{#1}}
+\DeclareOptionX{espaciorespuesta}{\renewcommand{\cmdua@glob@espaciorespuesta}{#1}}
+\DeclareOptionX{estudiante}{\renewcommand{\cmdua@glob@estudiante}{#1}}
+\DeclareOptionX{papel}{\renewcommand{\cmdua@glob@papel}{#1}}
+\DeclareOptionX{verpuntos}{\renewcommand{\cmdua@glob@verpuntos}{#1}}
+\ProcessOptionsX\relax
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% PAQUETES:
+
+\RequirePackage{
+	amsfonts,
+	amsmath,
+	amsthm,
+	array,
+	babelbib, % para bibtex en español.
+	enumitem, % para usar 'enumerate' con letras.
+	graphicx,
+	ifthen, % para usar condicionales.
+	multirow,
+	tabu,
+	totalcount, % para obtener los valores finales de un contador antes de ser incrementados.
+	xfp, % para hacer cálculos con \fpeval.
+	xintexpr, % usado para definir el comando \getdec.
+}
+
+\RequirePackage[table]{xcolor}
+
+\RequirePackage[
+	spanish, % para usar español.
+	%es-lcroman, % para los números romanos.
+	es-nodecimaldot, % para usar los decimales en inglés.
+	%es-noindentfirst, % para las sangrías.
+	%es-noquoting, % para las comillas.
+	es-nosectiondot, % para la numeración de secciones.
+	%es-noshorthands, % para desactivar abreviaciones de español.
+	es-tabla, % para etiquetar tablas en español.
+]{babel}
+
+\RequirePackage[latin1,utf8]{inputenc} % para las tildes.
+
+\RequirePackage[
+	\cmdua@glob@papel, % para el tamaño del papel.
+	bottom=2cm, % margen inferior.
+	left=1.6cm, % margen izquierdo.
+	right=3cm, % margen derecho.
+	top=3cm, % margen superior.
+	marginparwidth=1.75cm
+]{geometry}
+
+\RequirePackage[colorinlistoftodos]{todonotes}
+\RequirePackage[colorlinks=true,allcolors=blue]{hyperref}
+\RequirePackage[export]{adjustbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% COMANDOS:
+
+% ---------------------------------------------------------------------------------------------------
+
+\newcommand{\punto}[1]{ % puntos.
+	\ifnum\cmdua@glob@verpuntos>0{\textcolor{red}{(#1 \ifnum #1>1{puntos}\else{punto}\fi)}}\fi
+}
+
+% ---------------------------------------------------------------------------------------------------
+
+\newcommand{\rom}[1]{\uppercase\expandafter{\romannumeral #1\relax}} % convierte a número romano.
+
+% ---------------------------------------------------------------------------------------------------
+
+\newcommand{\logo}[1]{ % logo.
+	\begin{figure}\qquad\includegraphics[width=0.32\textwidth,right]{#1}\end{figure}
+}
+
+% ---------------------------------------------------------------------------------------------------
+
+\newcommand{\header}[6]{ % encabezado.
+	\begin{tabular}{|p{4cm}|p{\cmdua@glob@anchocabecera cm}K{2cm}p{5cm}|}\hline
+		\multicolumn{4}{|c|}{\cellcolor{red}{\bf\textcolor{white}{#1}}}\\\hline
+			\cellcolor{red}{\bf\textcolor{white}{Nombre Estudiante}}&#6&&\\\hline
+			\cellcolor{red}{\bf\textcolor{white}{Nombre Docente}}&#2&&\\\hline
+			\cellcolor{red}{\bf\textcolor{white}{Nivel}}&#3&\multicolumn{1}{|c|}{\cellcolor{red}{\bf\textcolor{white}{Fecha}}}&#4\\\hline
+			\cellcolor{red}{\bf\textcolor{white}{Puntaje Obtenido}}&&\multicolumn{1}{|c|}{\cellcolor{red}{\bf\textcolor{white}{Nota}}}&\\\hline
+		\multicolumn{4}{|c|}{\cellcolor{red}{\bf\textcolor{white}{REVISI\'ON DE #5}}}\\\hline
+			\cellcolor{red}{\bf\textcolor{white}{Fecha de revisi\'on}}&&\multicolumn{1}{|c|}{\cellcolor{red}{\bf\textcolor{white}{Firma del}}}&\\
+			\cellcolor{red}&&\multicolumn{1}{|c|}{\cellcolor{red}{\bf\textcolor{white}{Estudiante}}}&\\\hline
+	\end{tabular}\\[3mm]
+}
+
+% ---------------------------------------------------------------------------------------------------
+
+\newcommand{\results}[1]{ % resultados de aprendizaje.
+	\begin{tabular}{|p{\cmdua@glob@anchotabla cm}|}\hline
+		{\bf Resultados de aprendizaje a evaluar en este instrumento:}
+		\begin{itemize}#1\end{itemize}\\\hline
+	\end{tabular}\\[3mm]
+}
+
+% ---------------------------------------------------------------------------------------------------
+
+\newcommand{\resultado}[1]{\item #1} % resultado de aprendizaje.
+
+% ---------------------------------------------------------------------------------------------------
+
+\newcommand{\criteria}[1]{ % criterios de evaluación.
+	\begin{tabular}{|p{\cmdua@glob@anchotabla cm}|}\hline
+		Criterios de evaluaci\'on en este instrumento:
+			\begin{itemize}#1\end{itemize}\\\hline
+	\end{tabular}\\[3mm]
+}
+
+% ---------------------------------------------------------------------------------------------------
+
+\newcommand{\criterio}[2]{\item[]$\,$\kern-2em CE #1: #2} % criterio de evaluación.
+
+% ---------------------------------------------------------------------------------------------------
+
+\newcommand{\descript}[3]{
+	\def\puntajemultiple{#1} % puntaje de cada pregunta de selección múltiple.
+	\def\exigencianota{\fpeval{#2/100}} % exigencia de nota, usualmente se usa 60.
+	\def\thepuntajeformacion{#3} % puntaje para evaluación general mediante escala de apreciaci\'on.
+	\begin{tabular}{|p{\cmdua@glob@anchotabla cm}|}\hline
+		{\bf Descripci\'on del instrumento:}\\
+		%\ifnum #1>0
+		\ifnum\totalxmultiples>0{Este instrumento se compone de \totalxmultiples\ preguntas de selecci\'on m\'ultiple en cada una de las cuales usted debe escoger s\'olo una alternativa como respuesta. Adicionalmente contiene \totalxdesarrollos\ preguntas de desarrollo.}\else{Este instrumento se compone de \totalxdesarrollos\ preguntas de desarrollo. \ifnum\thepuntajeformacion>0{El criterio de evaluaci\'on general es evaluado mediante una peque\~{n}a escala de apreciaci\'on de \thepuntajeformacion{} puntos.}\else{}\fi}\fi\\
+		Puntaje ideal: \totalpuntajes\ puntos.\qquad\qquad\qquad Puntaje para nota 4,0 (#2\%) = \totalminimos\ifnum \totalminimodecimals>0{,\totalminimodecimals}\else{}\fi\ puntos.\\\hline
+	\end{tabular}\\[3mm]
+}
+
+% ---------------------------------------------------------------------------------------------------
+
+\newcommand{\instructions}[1]{ % instrucciones.
+	\begin{tabular}{|p{\cmdua@glob@anchotabla cm}|}\hline
+		{\bf Instrucciones generales:}\begin{itemize}#1\end{itemize}\\\hline
+	\end{tabular}
+}
+
+% ---------------------------------------------------------------------------------------------------
+
+\newcommand{\instruccion}[1]{\item #1} % instrucción.
+
+% ---------------------------------------------------------------------------------------------------
+
+\newcommand{\seccionmultiple}{
+	\ifnum \puntajemultiple>0{
+	\stepcounter{numeroseccion}
+	\begin{itemize}
+		\item[{\bf\rom{\thenumeroseccion}.}]{\bf \'Item selecci\'on m\'ultiple. Responda las siguientes preguntas seleccionando la alternativa correcta. (Puntaje total: \totalmultiplepuntajes\ puntos).}
+	\end{itemize}
+	}\fi
+}
+
+% ---------------------------------------------------------------------------------------------------
+
+\newcommand{\secciondesarrollo}{
+	\stepcounter{numeroseccion}
+	\begin{itemize}
+		\item[{\bf\rom{\thenumeroseccion}.}]{\bf \'Item de desarrollo breve. Responda las siguientes preguntas en el recuadro correspondiente. (Puntaje total: \totalxdesarrollopuntajes\ puntos).}
+	\end{itemize}
+}
+
+% ---------------------------------------------------------------------------------------------------
+
+\newcommand{\subcriterios}[1]{
+	\begin{tabular}{|p{\cmdua@glob@anchotabla cm}|}\hline{\bf Criterios de evaluaci\'on:}\\#1\hline\end{tabular}\\[3mm]
+}
+
+% ---------------------------------------------------------------------------------------------------
+
+\newcommand{\subcriterio}[2]{CE #1: #2\\}
+
+% ---------------------------------------------------------------------------------------------------
+
+% define variables para el comando "preguntamultiple".
+\makeatletter
+\define@cmdkey[ua]{pmult}{respuesta}{}
+
+% variables por defecto para el comando "preguntamultiple".
+\presetkeys[ua]{pmult}{
+	respuesta=,
+}{}
+
+\newcommand{\preguntamultiple}[5][]{
+	\setkeys[ua]{pmult}{#1} % carga variables.
+	\ifnum \puntajemultiple>0{
+	\stepcounter{multiple} % incrementa contador de preguntas de selección múltiple.
+	\begin{tabular}{|p{\cmdua@glob@anchotabla cm}|}\hline
+		{\bf \themultiple.} #2 (\puntajemultiple{} puntos) #3\\\hline $\,$\\[-0.8cm]
+		\begin{enumerate}[label=(\alph*)]#4\end{enumerate}
+		\\[-0.8cm]\\{\bf Alternativa correcta: }\ifnum\cmdua@glob@estudiante>0{}\else{(\cmdua@pmult@respuesta): #5}\fi\\\hline
+	\end{tabular}\\[3mm]
+	}\fi
+}
+
+% ---------------------------------------------------------------------------------------------------
+
+\newcommand{\alternativa}[1]{\item #1.} % alternativa para pregunta de selección multiple.
+
+% ---------------------------------------------------------------------------------------------------
+
+% define variables para el comando "preguntadesarrollo".
+\makeatletter
+\define@cmdkey[ua]{pdesr}{espacio}{}
+\define@cmdkey[ua]{pdesr}{puntaje}{}
+
+% variables por defecto para el comando "preguntadesarrollo".
+\presetkeys[ua]{pdesr}{
+	espacio=\cmdua@glob@espaciorespuesta,
+	puntaje=0,
+}{}
+
+\newcommand{\preguntadesarrollo}[4][]{
+	\setkeys[ua]{pdesr}{#1} % carga variables.
+	\stepcounter{desarrollo} % incrementa contador de preguntas de selección múltiple.
+	\addtocounter{desarrollopuntaje}{\cmdua@pdesr@puntaje} % incrementa el contador de puntaje de preguntas de desarrollo.
+	\begin{tabular}{|p{\cmdua@glob@anchotabla cm}|}\hline
+		{\bf \fpeval{\themultiple+\thedesarrollo}.} #2 (\cmdua@pdesr@puntaje{} puntos)#3\\\hline{\bf Respuesta: }\ifnum\cmdua@glob@estudiante>0{\vspace{\cmdua@pdesr@espacio cm}}\else{#4}\fi\\\hline
+	\end{tabular}\\[3mm]
+}
+
+% ---------------------------------------------------------------------------------------------------
+
+\newcommand{\finprueba}{ % actualiza los contadores con puntajes y cantidades.
+	\addtocounter{xmultiple}{\themultiple} % actualiza cantidad preguntas de selección múltiple.
+	\addtocounter{multiplepuntaje}{\fpeval{\puntajemultiple*\themultiple}} % actualiza puntaje de selección múltiple.
+	\addtocounter{xdesarrollo}{\thedesarrollo} % actualiza cantidad preguntas de desarrollo.
+	\addtocounter{xdesarrollopuntaje}{\thedesarrollopuntaje} % actualiza puntaje de desarrollo.
+	\newcommand\tpuntaje{\fpeval{(\puntajemultiple*\themultiple)+\thedesarrollopuntaje+\thepuntajeformacion}}
+	\addtocounter{puntaje}{\tpuntaje} % puntaje total.	
+	\addtocounter{minimo}{\fpeval{round(\tpuntaje*\exigencianota)}}
+	\addtocounter{minimodecimal}{\xintNum{\xintDecSplitR{0}{\fpeval{\tpuntaje*\exigencianota}}}\relax}
+}
+
+% ---------------------------------------------------------------------------------------------------
+
+\newcommand{\getdec}[1]{\xintNum{\xintDecSplitR{0}{#1}}\relax} % parte decimal de un número.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% PREÁMBULO (CONFIGURACIONES Y CONTADORES):
+
+\newcounter{multiple} % para contar las preguntas de selección múltiple.
+\newcounter{xmultiple}\DeclareTotalCounter{xmultiple} % cantidad preguntas de selección múltiple.
+\newcounter{multiplepuntaje}\DeclareTotalCounter{multiplepuntaje} % puntaje preguntas de selección múltiple.
+
+\newcounter{desarrollo} % para contar las preguntas de desarrollo.
+\newcounter{desarrollopuntaje} % para contar el puntaje de preguntas de desarrollo.
+\newcounter{xdesarrollo}\DeclareTotalCounter{xdesarrollo} % cantidad preguntas de desarrollo.
+\newcounter{xdesarrollopuntaje}\DeclareTotalCounter{xdesarrollopuntaje} % puntaje preguntas de desarrollo.
+
+\newcounter{puntaje}\DeclareTotalCounter{puntaje} % cantidad de puntaje.
+\newcounter{minimo}\DeclareTotalCounter{minimo} % parte entera del puntaje mínimo.
+\newcounter{minimodecimal}\DeclareTotalCounter{minimodecimal} % parte decimal del puntaje mínimo.
+
+\newcounter{numeroseccion} % para numerar las secciones (en principio son solo dos).
+
+\renewcommand\familydefault{\sfdefault}
+
+\setlength{\arrayrulewidth}{0.3mm}
+\renewcommand{\arraystretch}{1.2}
+
+\newcolumntype{s}{>{\columncolor[HTML]{AAACED}}p{3cm}}
+\newcolumntype{K}[1]{>{\centering\arraybackslash}p{#1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%{Prueba 1 -- QYF200 CÁLCULO}{Diego ARCIS}{2}{28 de septiembre de 2020}{PRUEBA}
+
+% define variables para el entorno "prueba".
+\makeatletter
+\define@cmdkey[ua]{prueba}{criterios}{}
+\define@cmdkey[ua]{prueba}{curso}{}
+\define@cmdkey[ua]{prueba}{docente}{}
+\define@cmdkey[ua]{prueba}{exigencia}{}
+\define@cmdkey[ua]{prueba}{estudiante}{}
+\define@cmdkey[ua]{prueba}{fecha}{}
+\define@cmdkey[ua]{prueba}{instrucciones}{}
+\define@cmdkey[ua]{prueba}{logo}{}
+\define@cmdkey[ua]{prueba}{nivel}{}
+\define@cmdkey[ua]{prueba}{puntajegeneral}{}
+\define@cmdkey[ua]{prueba}{puntajemultiple}{}
+\define@cmdkey[ua]{prueba}{resultados}{}
+\define@cmdkey[ua]{prueba}{titulo}{}
+
+% variables por defecto para el entorno "prueba".
+\presetkeys[ua]{prueba}{
+	criterios=,
+	curso=Curso,
+	docente=,
+	exigencia=60,
+	estudiante=,
+	fecha=,
+	instrucciones=,
+	logo=logo.pdf,
+	nivel=0,
+	puntajegeneral=0,
+	puntajemultiple=1,
+	resultados=,
+	titulo=Prueba,
+}{}
+
+\newenvironment{prueba}[2][]{
+	\setkeys[ua]{prueba}{#1} % carga variables.
+	\logo{\cmdua@prueba@logo} % agrega logo.	
+	\header{\cmdua@prueba@titulo{} -- \cmdua@prueba@curso}{\cmdua@prueba@docente}{\cmdua@prueba@nivel}{\cmdua@prueba@fecha}{#2}{\cmdua@prueba@estudiante}
+
+	\results{\cmdua@prueba@resultados}
+
+	\criteria{\cmdua@prueba@criterios}
+	
+	\descript{\cmdua@prueba@puntajemultiple}{\cmdua@prueba@exigencia}{\cmdua@prueba@puntajegeneral}
+	
+	\instructions{\cmdua@prueba@instrucciones}
+	
+}{
+	\finprueba
+}
